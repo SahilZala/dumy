@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/src/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:untitled/use_provider.dart';
 
 class MyFile extends StatefulWidget
 {
@@ -56,10 +59,11 @@ class _MyFile extends State<MyFile>
 
                   onChanged: (val){
 
-                    setState(() {
-                      searchIndex = val;
-                    });
-                    print(val);
+                    context.read<Search>().setSearch(val);
+                    // setState(() {
+                    //   searchIndex = val;
+                    // });
+                   // print(val);
                   },
                   style: const TextStyle(
                       color: Colors.black,
@@ -97,7 +101,34 @@ class _MyFile extends State<MyFile>
 
                     List data = jd['tags'];
 
-                    return Column(
+                    return Consumer<Search>(builder: (context,todo,child){
+                      return Column(
+                        children: data.map((e){
+                          if(todo.search == "")
+                          {
+                            return getContainer(e);
+                          }
+                          else{
+                            //print(e['displayName'].toString().substring(0,searchIndex.length));
+                            if(todo.search.length <= e['displayName'].toString().length)
+                            {
+                              if(e['displayName'].toString().substring(0,todo.search.length).toLowerCase() == todo.search.toLowerCase())
+                              {
+                                return getContainer(e);
+                              }
+                              else{
+                                return Container();
+                              }
+                            }
+                            else{
+                              return Container();
+                            }
+
+                          }
+
+                        }).toList(),
+                      );
+                    }); Column(
                       children: data.map((e){
                         if(searchIndex == "")
                         {
